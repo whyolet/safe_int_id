@@ -39,6 +39,7 @@ These IDs are great for their use cases, but none meets our special requirements
     * If you need even shorter string, you can encode and decode ID, e.g:
         * `9007199254740991.toRadixString(36) == "2gosa7pa2gv"`
         * `int.parse("2gosa7pa2gv", radix: 36) == 9007199254740991`
+* ID could optionally contain an auto-incrementing counter instead of a random part.
 
 ## Not required
 
@@ -59,7 +60,7 @@ These IDs are great for their use cases, but none meets our special requirements
     * We could have 54 bits by using negative integers too,
       but this would increase complexity and reduce compatibility.
     * So we have 53 bits.
-* ID contains:
+* ID contains, by default:
     * 43 bits of timestamp:
         * Milliseconds since the UTC start of the first year you use this ID,
           2023 by default, configurable:
@@ -135,3 +136,11 @@ These IDs are great for their use cases, but none meets our special requirements
 | 32768 | 0 | 0.01%  | 0.04% | 0.2% |   1% |  1% |  2% |  5% | 10% | 15% | 34% |     |     |
 | 65536 | 0 | 0.003% | 0.01% | 0.1% | 0.3% |  1% |  1% |  3% |  5% |  8% | 17% | 31% | 48% |
 ```
+
+* If you generate a lot of IDs on the same device,
+  use `incId()` instead of `getId()`:
+    * `incId()` increments a counter instead of using a random value.
+    * This counter resets to zero each millisecond, and blocks reaching `randomValues` (1024 by default).
+    * If a hot loop for less than 1 millisecond burns,
+      use `await incIdAsync()` or increase `randomValues` in exchange for `safeYears`.
+    * This way you can get a non-decreasing sequence of unique IDs.

@@ -25,6 +25,12 @@ class SafeIntId {
   /// Last year this ID will be safe.
   late final int lastSafeYear;
 
+  /// Counter used by [incId].
+  int _counter = 0;
+
+  /// The previous number of milliseconds in [incId].
+  int _previousMillis = 0;
+
   /// Create new `SafeIntId` generator.
   SafeIntId({
     this.firstYear = 2023,
@@ -44,6 +50,37 @@ class SafeIntId {
   int getId() {
     final millis = DateTime.now().millisecondsSinceEpoch - _firstYearMillis;
     return millis * randomValues + random.nextInt(randomValues);
+  }
+
+  /// The same as [getId] but increments counter instead of using random value.
+  /// Counter resets to zero each millisecond, blocks reaching [randomValues].
+  /// Use `await incIdAsync()` if hot loop for less than 1 millisecond burns.
+  int incId() {
+    while (true) {
+      final millis = DateTime.now().millisecondsSinceEpoch - _firstYearMillis;
+      if (_previousMillis != millis) {
+        _counter = 0;
+        _previousMillis = millis;
+      }
+      if (_counter >= randomValues) continue; // `sleep` is N/A on web platform.
+      return millis * randomValues + _counter++;
+    }
+  }
+
+  /// The same as [incId] but async.
+  Future<int> incIdAsync() async {
+    while (true) {
+      final millis = DateTime.now().millisecondsSinceEpoch - _firstYearMillis;
+      if (_previousMillis != millis) {
+        _counter = 0;
+        _previousMillis = millis;
+      }
+      if (_counter >= randomValues) {
+        await Future.delayed(Duration(microseconds: 100));
+        continue;
+      }
+      return millis * randomValues + _counter++;
+    }
   }
 
   /// Get [DateTime] when given [id] was created at.

@@ -14,6 +14,12 @@ void main() {
   final createdAt = safeIntId.getCreatedAt(id, isUtc: true);
   print("createdAt: $createdAt");
 
+  // Increment a counter instead of using a random value.
+  // Counter resets to zero each millisecond, blocks reaching max (1024 by default).
+  final id1 = safeIntId.incId();
+  final id2 = safeIntId.incId();
+  assert(id1 < id2);
+
   // Custom configuration, defaults are:
   final customId = SafeIntId(
     firstYear: 2023, // The first year you use this ID.

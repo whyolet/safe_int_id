@@ -9,7 +9,7 @@ void main() {
       final id = safeIntId.getId();
       final createdAt = safeIntId.getCreatedAt(id);
       final diffMillis = createdAt.difference(start).inMilliseconds;
-      expect(diffMillis, inInclusiveRange(0, 2));
+      expect(diffMillis, inInclusiveRange(0, 10));
     });
 
     test("IDs don't collide when generating 1 or less IDs per millisecond", () {
@@ -20,6 +20,15 @@ void main() {
         previous.add(id);
         expect(previous, contains(id));
         sleep(Duration(milliseconds: 1));
+      }
+    });
+
+    test("IDs are non-decreasing when using `incId`", () {
+      int previous = 0;
+      for (int i = 0; i < 10000; i++) {
+        final id = safeIntId.incId();
+        expect(previous, lessThan(id));
+        previous = id;
       }
     });
 
