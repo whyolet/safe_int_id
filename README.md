@@ -143,4 +143,4 @@ These IDs are great for their use cases, but none meets our special requirements
     * This counter resets to zero each millisecond, and blocks reaching `randomValues` (1024 by default).
     * If a hot loop for less than 1 millisecond burns,
       use `await incIdAsync()` or increase `randomValues` in exchange for `safeYears`.
-    * This way you can get a non-decreasing sequence of unique IDs.
+    * This way you can get an increasing sequence of unique IDs.
